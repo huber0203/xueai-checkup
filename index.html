@@ -241,19 +241,6 @@ function result(){
   <p class="sub"><b>上課時段：</b>${when}</p>
   <p class="sub"><b>成果節奏：</b>${speed}</p>
  </section>
- <details>
-  <summary>業務小抄（給工作人員看）</summary>
-  <div class="cheat">
-   <ul>
-    <li>推薦：<b>${R.plan.n}</b>，價格與現場優惠在<a href="https://claude.ai/artifact/LVHttvWA1TiJANXpgf6XS9" target="_blank" rel="noopener">主推版簡報</a>第 27 頁</li>
-    <li>卡點：${esc(a.stuck||'—')}　時段：${esc(a.when||'—')}　想看到成果：${esc(a.speed||'—')}</li>
-    <li>工作：${esc(a.job||'—')}　每週重複工作：${esc(a.hrs||'—')}</li>
-   </ul>
-   <q>${nm}，你現在是${R.level[0]}，照你想做的${R.goal.length?esc(R.goal[0].split('、')[0]):'作品'}，最適合選${R.plan.n.split('｜')[1]}這個方案。學會後一週能省 ${R.save} 小時，一年就是 ${R.save*50} 小時。今天現場報名有獨家優惠，我直接帶你看價格。</q>
-   ${a.when==='都不太行'?'<q>時段我先幫你登記候補，你先把今天的優惠鎖下來，開新班我第一個通知你。</q>':''}
-   <p class="mute">記得把結果記到撥號台，並在問卷右下角勾「已健檢」。</p>
-  </div>
- </details>
  <div class="save" id="save"></div>
  <p class="disc">本健檢依你的回答估算，分數供選課參考。學員收入、成果依個人投入而異。</p>
  <div class="actions"><button class="btn ghost" id="redo">修改答案</button><button class="btn" id="new">換下一位</button></div>`;
