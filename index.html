@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>學AI 健檢</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Inter:wght@600;800;900&display=swap">
+<style>
+:root{
+  --bg:#f4f6fb;--card:#ffffff;--ink:#16213a;--sub:#5b6680;--mute:#8a94a8;--line:#dde3ef;
+  --blue:#4d7fff;--blue-ink:#ffffff;--blue-soft:#eaf0ff;--navy:#16213a;--navy-ink:#ffffff;
+  --good:#16a37a;--warn:#e8890c;--sel:#eaf0ff;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0f1524;--card:#18203a;--ink:#eef2ff;--sub:#b3bdd6;--mute:#8590ab;--line:#2a3456;
+  --blue:#5f8cff;--blue-soft:#1f2b52;--navy:#0a0f1d;--sel:#22305c;--good:#3cc99c;--warn:#f2a640;color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f1524;--card:#18203a;--ink:#eef2ff;--sub:#b3bdd6;--mute:#8590ab;--line:#2a3456;
+  --blue:#5f8cff;--blue-soft:#1f2b52;--navy:#0a0f1d;--sel:#22305c;--good:#3cc99c;--warn:#f2a640;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Noto Sans TC","PingFang TC",system-ui,sans-serif;font-size:16px;line-height:1.55}
+.top{background:var(--navy);color:var(--navy-ink);padding-block:14px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.top .in{max-width:760px;margin:0 auto;display:flex;align-items:center;gap:14px}
+.top img{height:40px;width:auto}
+.top b{font-size:18px;font-weight:900;letter-spacing:.04em}
+.top span{margin-left:auto;font-size:13px;color:#b9c6ef}
+main{max-width:760px;margin:0 auto;padding-block:22px 60px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:18px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:24px;display:flex;flex-direction:column;gap:16px;min-width:0}
+h1{font-size:clamp(26px,5vw,36px);font-weight:900;line-height:1.25;margin:0;text-wrap:balance}
+h2{font-size:clamp(20px,3.6vw,26px);font-weight:900;line-height:1.3;margin:0;text-wrap:balance}
+h3{font-size:17px;font-weight:800;margin:0}
+p{margin:0}
+.sub{color:var(--sub)}
+.mute{color:var(--mute);font-size:13px}
+.lbl{font-size:12px;letter-spacing:.12em;color:var(--blue);font-weight:800}
+.btn{appearance:none;border:0;border-radius:12px;padding:14px 22px;font:inherit;font-weight:800;font-size:17px;cursor:pointer;background:var(--blue);color:var(--blue-ink);min-height:52px}
+.btn.ghost{background:transparent;color:var(--sub);border:1px solid var(--line)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn:focus-visible,.opt:focus-visible,input:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+.actions{display:flex;gap:12px;flex-wrap:wrap;justify-content:space-between}
+input[type=text]{font:inherit;font-size:18px;padding:14px 16px;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:var(--ink);width:100%}
+.bar{height:8px;border-radius:99px;background:var(--line);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--blue);border-radius:99px;transition:width .35s}
+.opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:12px}
+.opt{appearance:none;text-align:left;font:inherit;font-size:17px;font-weight:600;color:var(--ink);background:var(--card);border:2px solid var(--line);border-radius:14px;padding:14px 16px;cursor:pointer;display:flex;gap:12px;align-items:center;min-height:58px}
+.opt .k{flex:none;width:24px;height:24px;border-radius:50%;border:2px solid var(--mute);display:grid;place-items:center;font-size:14px;color:transparent}
+.opt.m .k{border-radius:6px}
+.opt[aria-pressed="true"]{border-color:var(--blue);background:var(--sel)}
+.opt[aria-pressed="true"] .k{background:var(--blue);border-color:var(--blue);color:var(--blue-ink)}
+.opt small{display:block;font-size:13px;color:var(--mute);font-weight:400}
+/* result */
+.score{display:grid;grid-template-columns:auto 1fr;gap:22px;align-items:center}
+.ring{width:150px;height:150px;position:relative}
+.ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.ring .v{position:absolute;inset:0;display:grid;place-items:center;text-align:center}
+.ring .v b{font-family:Inter,sans-serif;font-size:44px;font-weight:900;line-height:1}
+.ring .v small{display:block;font-size:12px;color:var(--mute)}
+.pill{display:inline-block;align-self:flex-start;background:var(--blue);color:var(--blue-ink);border-radius:99px;padding:4px 14px;font-weight:800;font-size:14px}
+.dims{display:flex;flex-direction:column;gap:12px}
+.dim{display:grid;grid-template-columns:96px 1fr 44px;gap:10px;align-items:center;font-size:15px}
+.dim .tr{position:relative;height:14px;border-radius:99px;background:var(--line)}
+.dim .tr i{position:absolute;left:0;top:0;bottom:0;border-radius:99px}
+.dim .tr .to{background:var(--blue-soft);border:1px dashed var(--blue)}
+.dim .tr .now{background:var(--blue)}
+.dim em{font-style:normal;font-family:Inter,sans-serif;font-weight:800;text-align:right;color:var(--sub)}
+.legend{display:flex;gap:18px;font-size:13px;color:var(--mute);flex-wrap:wrap}
+.legend span{display:inline-flex;gap:6px;align-items:center}
+.legend span:before{content:"";width:14px;height:10px;border-radius:4px;background:var(--blue)}
+.legend span.t:before{background:var(--blue-soft);border:1px dashed var(--blue)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,180px),1fr));gap:12px}
+.stat{background:var(--blue-soft);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:4px}
+.stat b{font-family:Inter,sans-serif;font-size:34px;font-weight:900;color:var(--blue);line-height:1.1}
+.stat b small{font-size:16px;font-family:"Noto Sans TC",sans-serif}
+.fix{display:grid;grid-template-columns:1fr;gap:10px}
+.fix div{border-left:4px solid var(--warn);padding:4px 0 4px 14px}
+.fix div.ok{border-color:var(--good)}
+.plan{border:2px solid var(--blue);border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:12px;background:var(--card)}
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,190px),1fr));gap:10px}
+.step{border-radius:12px;padding:12px 14px;background:var(--bg);border:1px solid var(--line);display:flex;flex-direction:column;gap:4px}
+.step.on{border-color:var(--blue)}
+.step b{font-size:15px}
+.step span{font-size:13px;color:var(--sub)}
+.step.off{opacity:.45}
+.wk{display:flex;flex-direction:column;gap:8px}
+.wk div{display:grid;grid-template-columns:7.5em 1fr;gap:10px;font-size:15px}
+.wk div b{color:var(--blue);font-weight:800}
+details{border:1px dashed var(--mute);border-radius:14px;padding:14px 18px;background:var(--card)}
+details summary{cursor:pointer;font-weight:800;color:var(--sub)}
+details[open] summary{margin-bottom:12px}
+.cheat{display:flex;flex-direction:column;gap:12px;font-size:15px}
+.cheat q{display:block;background:var(--bg);border-radius:10px;padding:10px 14px;quotes:"「" "」"}
+.cheat a{color:var(--blue);font-weight:800}
+.cheat ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px}
+.disc{font-size:12px;color:var(--mute)}
+.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));gap:12px}
+.two label{display:flex;flex-direction:column;gap:6px;font-weight:800;font-size:15px;min-width:0}
+.two input{font-size:17px}
+.save{border-radius:14px;padding:12px 16px;font-size:15px;display:flex;flex-direction:column;gap:8px;background:var(--blue-soft)}
+.save.ok{border-left:4px solid var(--good)}
+.save.bad{border-left:4px solid var(--warn)}
+.save textarea{font:inherit;font-size:14px;width:100%;min-height:96px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:10px}
+.link{appearance:none;background:none;border:0;padding:6px 0;font:inherit;font-size:15px;font-weight:800;color:var(--blue);cursor:pointer;text-decoration:underline}
+.rec{display:flex;flex-direction:column;gap:10px}
+.rec .it{border:1px solid var(--line);border-radius:14px;padding:12px 16px;display:grid;grid-template-columns:1fr auto;gap:4px 12px;background:var(--card)}
+.rec .it b{font-size:17px}
+.rec .it .sc{font-family:Inter,sans-serif;font-weight:900;font-size:26px;color:var(--blue);grid-row:span 2;align-self:center}
+.rec .it span{font-size:14px;color:var(--sub);min-width:0;overflow-wrap:anywhere}
+@media (max-width:520px){.card{padding:18px}.score{grid-template-columns:1fr;justify-items:center;text-align:center}.score .pill{align-self:center}.dim{grid-template-columns:78px 1fr 38px;font-size:14px}}
+</style></head><body>
+
+<div class="top"><div class="in"><img src="logo.png" alt="學AI"><b>AI 健檢</b><span>約 3 分鐘</span></div></div>
+<main id="app" aria-live="polite"></main>
+
+<script>
+const Q=[
+ {id:'job',t:'你現在的工作是？',o:['上班族','自己開店／創業','自由接案','學生','待業／轉職中','其他']},
+ {id:'hrs',t:'你每週大概花多少時間，在做圖、寫文案、剪片、回訊息這類重複的事？',o:['2 小時以內','2～5 小時','5～10 小時','10 小時以上']},
+ {id:'used',t:'這些 AI 你用過哪些？',m:1,o:['聊天問答（ChatGPT 之類）','用 AI 生圖','用 AI 做影片','AI 配音、配樂','做自動化流程或小工具','都還沒用過']},
+ {id:'stuck',t:'用 AI 最卡的地方是？',o:['不知道從哪開始','做出來不好看、不能用','不知道怎麼跟 AI 講','沒時間自己摸索','學了，但不知道用在哪']},
+ {id:'goal',t:'學會之後，最想做出什麼？',m:1,o:['自己的 AI 分身、數字人影片','商品照、海報、社群圖','短影音、經營自媒體','AI 漫劇、說故事的影片','不寫程式，做自己的小 App','接案賺外快、幫工作加薪']},
+ {id:'when',t:'每週固定空出 3 小時上實體課，哪個時段可以？',o:['週日 13:00～16:00','週一 14:00～17:00','兩個都可以','都不太行']},
+ {id:'speed',t:'你希望多久看到第一個成果？',o:['1 個月內','2 個月內','半年內慢慢來']},
+];
+const PLANS=[
+ {n:'方案 1｜初階＋中階',d:'5 個月',goal:'AI 漫劇、自媒體高手',tiers:[1,2],hot:1},
+ {n:'方案 2｜三階全包',d:'8 個月',goal:'AI App 開發者',tiers:[1,2,3]},
+];
+const TIERS={1:['初階班','做數字人・2 個月'],2:['中階班','短影音＋AI 漫劇・3 個月'],3:['高階班','用講的做 App・3 個月']};
+const FIRST={1:[['第 1 週','建立你的人物分身'],['第 2 週','3 張專業商品照'],['第 6 週','你的 AI 分身開口說話'],['第 8 週','期末作品集發表']],
+ 2:[['第 1 週','30 個選題清單'],['第 3 週','一支字卡口播短影音'],['第 7 週','第 1 集 1 分鐘漫劇'],['第 8 週','第 1 集正式上架']],
+ 3:[['第 1 週','用講的做出第一個網頁'],['第 4 週','放到手機桌面像 App'],['第 9 週','店家菜單網頁'],['第 10 週','店家 AI 小幫手']]};
+const FIX={
+ '不知道從哪開始':['路線已經排好','學伴照「打底 → 上手 → 做作品 → 出口」四步帶你走，第一週就有成果。'],
+ '做出來不好看、不能用':['每週一個能用的成品','每堂課做完一個成品，助教坐旁邊當場幫你修到能用。'],
+ '不知道怎麼跟 AI 講':['現場示範怎麼講','講師先示範一次，你照著改，一句中文就能開始。'],
+ '沒時間自己摸索':['每週固定 3 小時','不用自己爬文找工具，固定時間來上課，工具也幫你配好。'],
+ '學了，但不知道用在哪':['從你的工作出題','作品直接用在你的工作、店或帳號，學完就能拿出去用。'],
+};
+let staff0='';try{staff0=localStorage.getItem('hc-staff')||''}catch(e){}
+let S={name:'',phone:'',staff:staff0,i:-1,a:{},id:null};
+let dbP=null;const getDb=()=>dbP||(dbP=(window.claude&&claude.use)?claude.use('db').catch(()=>null):Promise.resolve(null));
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const app=$('#app');
+
+function intro(){
+ app.innerHTML=`<section class="card">
+  <p class="lbl">講座限定・免費</p>
+  <h1>3 分鐘，看你現在的 AI 能力在哪一階</h1>
+  <p class="sub">回答 7 題，馬上得到你的 AI 能力分數、每週能省下的時間，和最適合你的學習路線。</p>
+  <div class="two">
+   <label>怎麼稱呼你？<input id="nm" type="text" maxlength="12" placeholder="例如：小美" value="${esc(S.name)}" autocomplete="off"></label>
+   <label>手機<input id="ph" type="text" inputmode="tel" maxlength="20" placeholder="0912-345-678" value="${esc(S.phone)}" autocomplete="off"></label>
+  </div>
+  <div class="two"><label>帶你做健檢的工作人員<input id="st" type="text" maxlength="10" placeholder="例如：Terry" value="${esc(S.staff)}" autocomplete="off"></label></div>
+  <div class="actions"><span></span><button class="btn" id="go">開始健檢</button></div>
+ </section>`;
+ const go=()=>{S.name=$('#nm').value.trim();S.phone=$('#ph').value.trim();S.staff=$('#st').value.trim();try{localStorage.setItem('hc-staff',S.staff)}catch(e){}S.i=0;render()};
+ $('#go').onclick=go;$('#nm').onkeydown=e=>{if(e.key==='Enter')go()};
+}
+function question(){
+ const q=Q[S.i],cur=S.a[q.id]||(q.m?[]:null);
+ app.innerHTML=`<div class="bar" aria-hidden="true"><i style="width:${(S.i)/Q.length*100}%"></i></div>
+ <section class="card">
+  <p class="lbl">第 ${S.i+1} 題／共 ${Q.length} 題${q.m?'・可複選':''}</p>
+  <h2>${q.t}</h2>
+  <div class="opts" role="${q.m?'group':'radiogroup'}">${q.o.map((o,k)=>`<button class="opt${q.m?' m':''}" data-k="${k}" aria-pressed="${q.m?cur.includes(o):cur===o}"><span class="k">✓</span>${o}</button>`).join('')}</div>
+  <div class="actions"><button class="btn ghost" id="back">上一題</button><button class="btn" id="next" ${q.m?(cur.length?'':'disabled'):'hidden'}>${S.i===Q.length-1?'看健檢結果':'下一題'}</button></div>
+ </section>`;
+ app.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{
+  const o=q.o[+b.dataset.k];
+  if(q.m){let v=S.a[q.id]||[];
+    if(o==='都還沒用過')v=v.includes(o)?[]:[o];
+    else{v=v.filter(x=>x!=='都還沒用過');v=v.includes(o)?v.filter(x=>x!==o):[...v,o]}
+    S.a[q.id]=v;question();}
+  else{S.a[q.id]=o;setTimeout(next,160);b.setAttribute('aria-pressed','true')}
+ });
+ $('#back').onclick=()=>{S.i--;render()};
+ const n=$('#next');if(n)n.onclick=next;
+ const f=app.querySelector('.opt[aria-pressed="true"]')||app.querySelector('.opt');f&&f.focus({preventScroll:true});
+}
+function next(){S.i++;render()}
+
+function calc(){
+ const a=S.a,used=(a.used||[]).filter(x=>x!=='都還沒用過'),goal=a.goal||[];
+ const has=x=>used.some(u=>u.includes(x));
+ let score=18+used.length*12;
+ if(['做出來不好看、不能用','學了，但不知道用在哪'].includes(a.stuck))score+=8;
+ if(a.job==='自由接案')score+=4;
+ score=Math.max(12,Math.min(92,score));
+ const level=score<40?['起步階段','先打底，第一個月就能做出看得到的成果']:score<68?['上手階段','你已經會用，差的是做出能發布、能用的作品']:['進階階段','你已經能做作品，可以往系列化與做工具前進'];
+ const dims=[
+  ['圖像設計',20+(has('生圖')?35:0)+(has('聊天')?5:0),85],
+  ['影音製作',15+(has('影片')?30:0)+(has('配音')?20:0),85],
+  ['內容企劃',20+(has('聊天')?30:0)+(goal.some(g=>/自媒體|漫劇/.test(g))?5:0),85],
+  ['自動化工具',10+(has('自動化')?45:0),goal.some(g=>/App/.test(g))?85:45],
+  ['變現應用',12+(/接案|開店/.test(a.job||'')?20:0)+(used.length>=3?15:0),80],
+ ].map(([n,v,t])=>[n,Math.min(v,90),Math.max(t,Math.min(v,90))]);
+ let tier=1;
+ if(goal.some(g=>/自媒體|漫劇/.test(g)))tier=2;
+ if(goal.some(g=>/App/.test(g)))tier=3;
+ if(tier===1&&goal.some(g=>/接案/.test(g)))tier=2;
+ const plan=PLANS[tier===3?1:0];
+ const hrsMap={'2 小時以內':1.5,'2～5 小時':3.5,'5～10 小時':7.5,'10 小時以上':12};
+ const save=Math.max(1,Math.round((hrsMap[a.hrs]||3.5)*.6));
+ return {score,level,dims,tier,plan,save,used,goal};
+}
+function ring(v){const r=64,c=2*Math.PI*r;return `<svg viewBox="0 0 150 150" aria-hidden="true"><circle cx="75" cy="75" r="${r}" fill="none" stroke="var(--line)" stroke-width="12"/><circle cx="75" cy="75" r="${r}" fill="none" stroke="var(--blue)" stroke-width="12" stroke-linecap="round" stroke-dasharray="${c}" stroke-dashoffset="${c*(1-v/100)}"/></svg>`}
+function result(){
+ const R=calc(),a=S.a,nm=S.name?esc(S.name):'你';
+ const fix=FIX[a.stuck];
+ const when=a.when==='都不太行'?'時段都不太行：先登記候補，下一梯開新時段會優先通知你':a.when==='兩個都可以'?'週日 13:00～16:00 或週一 14:00～17:00，兩班都可以選':`${a.when}，12/13 那週開課`;
+ const speed=a.speed==='1 個月內'?'第 1 週就做出人物分身，1 個月內有 4 個成品':a.speed==='2 個月內'?'2 個月完成初階，帶走一整套作品集':'照你的步調，一階一階往上';
+ app.innerHTML=`<section class="card">
+  <p class="lbl">${nm} 的 AI 健檢報告</p>
+  <div class="score">
+   <div class="ring">${ring(R.score)}<div class="v"><div><b>${R.score}</b><small>AI 能力指數</small></div></div></div>
+   <div style="display:flex;flex-direction:column;gap:10px;min-width:0">
+    <span class="pill">${R.level[0]}</span>
+    <h2>${R.level[1]}</h2>
+   </div>
+  </div>
+ </section>
+ <section class="card">
+  <h3>五項能力：現在 vs 學完</h3>
+  <div class="dims">${R.dims.map(([n,v,t])=>`<div class="dim"><span>${n}</span><div class="tr"><i class="to" style="width:${t}%"></i><i class="now" style="width:${v}%"></i></div><em>${v}</em></div>`).join('')}</div>
+  <div class="legend"><span>現在</span><span class="t">學完${R.plan.n.split('｜')[1]}</span></div>
+ </section>
+ <section class="stats">
+  <div class="stat"><span class="mute">學會後，每週可省下</span><b>${R.save}<small> 小時</small></b><span class="mute">一年約 ${R.save*50} 小時</span></div>
+  <div class="stat"><span class="mute">你已經用過的 AI</span><b>${R.used.length}<small> 種</small></b><span class="mute">${R.used.length?'有基礎，上手更快':'從零開始也跟得上'}</span></div>
+  <div class="stat"><span class="mute">想做出的作品</span><b>${R.goal.length}<small> 項</small></b><span class="mute">課綱全部涵蓋</span></div>
+ </section>
+ ${fix?`<section class="card"><h3>你最卡的地方，課堂上怎麼解</h3><div class="fix"><div><b>${esc(a.stuck)}</b></div><div class="ok"><b>${fix[0]}</b><p class="sub">${fix[1]}</p></div></div></section>`:''}
+ <section class="plan">
+  <p class="lbl">最適合你的路線</p>
+  <h2>${R.plan.n}${R.plan.hot?'　<span class="pill">最熱門</span>':''}</h2>
+  <p class="sub">${R.plan.d}・每週 3 小時・目標：${R.plan.goal}</p>
+  <div class="steps">${[1,2,3].map(t=>`<div class="step ${R.plan.tiers.includes(t)?'on':'off'}"><b>第 ${t} 階　${TIERS[t][0]}</b><span>${TIERS[t][1]}</span></div>`).join('')}</div>
+  <h3>你會做出這些</h3>
+  <div class="wk">${R.plan.tiers.flatMap(t=>FIRST[t].slice(0,t===1?4:2).map(([w,x])=>`<div><b>${TIERS[t][0].slice(0,2)}${w.replace(/ /g,'')}</b><span>${x}</span></div>`)).join('')}</div>
+  <p class="sub"><b>上課時段：</b>${when}</p>
+  <p class="sub"><b>成果節奏：</b>${speed}</p>
+ </section>
+ <details>
+  <summary>業務小抄（給工作人員看）</summary>
+  <div class="cheat">
+   <ul>
+    <li>推薦：<b>${R.plan.n}</b>，價格與現場優惠在<a href="https://claude.ai/artifact/LVHttvWA1TiJANXpgf6XS9" target="_blank" rel="noopener">主推版簡報</a>第 27 頁</li>
+    <li>卡點：${esc(a.stuck||'—')}　時段：${esc(a.when||'—')}　想看到成果：${esc(a.speed||'—')}</li>
+    <li>工作：${esc(a.job||'—')}　每週重複工作：${esc(a.hrs||'—')}</li>
+   </ul>
+   <q>${nm}，你現在是${R.level[0]}，照你想做的${R.goal.length?esc(R.goal[0].split('、')[0]):'作品'}，最適合從${R.plan.n.split('｜')[1]}開始。學會後一週能省 ${R.save} 小時，一年就是 ${R.save*50} 小時。今天現場報名有獨家優惠，我直接帶你看價格。</q>
+   ${a.when==='都不太行'?'<q>時段我先幫你登記候補，你先把今天的優惠鎖下來，開新班我第一個通知你。</q>':''}
+   <p class="mute">記得把結果記到撥號台，並在問卷右下角勾「已健檢」。</p>
+  </div>
+ </details>
+ <div class="save" id="save"></div>
+ <p class="disc">本健檢依你的回答估算，分數供選課參考。學員收入、成果依個人投入而異。</p>
+ <div class="actions"><button class="btn ghost" id="redo">修改答案</button><button class="btn" id="new">換下一位</button></div>`;
+ $('#redo').onclick=()=>{S.i=0;render()};
+ $('#new').onclick=()=>{S={name:'',phone:'',staff:S.staff,i:-1,a:{},id:null};render()};
+ window.scrollTo({top:0});
+ store(R);
+}
+function summary(R){const a=S.a;return `【AI 健檢】${S.name||'未填名'} ${S.phone||''}\n分數 ${R.score}（${R.level[0]}）推薦 ${R.plan.n}\n工作：${a.job||'—'}｜每週重複工作：${a.hrs||'—'}\n用過：${R.used.join('、')||'都還沒用過'}\n想做：${R.goal.join('、')||'—'}\n卡點：${a.stuck||'—'}｜時段：${a.when||'—'}｜成果：${a.speed||'—'}\n工作人員：${S.staff||'—'}`}
+async function store(R){
+ const box=$('#save');const txt=summary(R);
+ const fail=()=>{if(!box.isConnected)return;box.className='save bad';box.innerHTML=`<b>做完了！把這個畫面給現場小幫手看</b><span class="sub">工作人員：按「複製」把下面這段傳給 66。</span><textarea readonly>${esc(txt)}</textarea><div><button class="btn ghost" id="cp">複製</button></div>`;
+  const ta=box.querySelector('textarea');$('#cp').onclick=async()=>{try{await navigator.clipboard.writeText(txt);$('#cp').textContent='已複製'}catch(e){ta.select()}}};
+ return fail();
+ const db=null;
+ if(!S.id)S.id=Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+ const a=S.a;
+ const doc={name:S.name,phone:S.phone,staff:S.staff,score:R.score,level:R.level[0],plan:R.plan.n,save_hours:R.save,
+  job:a.job||'',hrs:a.hrs||'',used:R.used,stuck:a.stuck||'',goal:R.goal,when:a.when||'',speed:a.speed||'',
+  at:new Date().toISOString(),day:new Date().toLocaleDateString('zh-TW')};
+ try{await db.collection('checks').doc(S.id).set(doc)}
+ catch(e){try{if(e&&e.code==='unavailable'){await new Promise(r=>setTimeout(r,800+Math.random()*700));await db.collection('checks').doc(S.id).set(doc)}else throw e}catch(e2){return fail()}}
+ if(box.isConnected){box.className='save ok';box.innerHTML='<b>✓ 已存到健檢紀錄</b><span class="sub">66 和業務可以在首頁「看健檢紀錄」查到。</span>'}
+}
+let unsub=null;
+async function records(){
+ app.innerHTML=`<section class="card"><p class="lbl">工作人員用</p><h2>健檢紀錄</h2><p class="sub" id="rs">讀取中…</p><div class="rec" id="rl"></div>
+  <div class="actions"><button class="btn ghost" id="bk">回健檢</button><button class="btn" id="cpa" hidden>複製全部（貼到試算表）</button></div></section>`;
+ $('#bk').onclick=()=>{if(unsub){unsub();unsub=null}render()};
+ const db=await getDb();
+ if(!db){$('#rs').textContent='要用登入 claude.ai、有權限的帳號開這頁才看得到紀錄。';return}
+ let done=false;const t=setTimeout(()=>{if(!done&&$('#rs'))$('#rs').textContent='連線較慢，紀錄暫時讀不到，稍等一下。'},10000);
+ unsub=db.collection('checks').orderBy('at','desc').limit(500).onSnapshot(snap=>{
+  if(!snap.metadata.fromCache){done=true;clearTimeout(t)}
+  const rows=snap.docs.map(d=>d.data());if(!$('#rl'))return;
+  $('#rs').textContent=rows.length?`共 ${rows.length} 筆，最新的在最上面`:'還沒有紀錄（或你的帳號沒有查看權限）。';
+  $('#rl').innerHTML=rows.map(r=>`<div class="it"><b>${esc(r.name||'未填名')}　<span>${esc(r.phone||'')}</span></b><div class="sc">${esc(r.score)}</div><span>${esc(r.plan||'')}・${esc(r.when||'')}・工作人員 ${esc(r.staff||'—')}・${esc(new Date(r.at).toLocaleString('zh-TW',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'}))}</span></div>`).join('');
+  const b=$('#cpa');b.hidden=!rows.length;
+  b.onclick=async()=>{const H=['時間','姓名','手機','分數','階段','推薦方案','工作','每週重複工作','用過','想做','卡點','時段','成果','工作人員'];
+   const tsv=[H,...rows.map(r=>[new Date(r.at).toLocaleString('zh-TW'),r.name,r.phone,r.score,r.level,r.plan,r.job,r.hrs,(r.used||[]).join('、'),(r.goal||[]).join('、'),r.stuck,r.when,r.speed,r.staff])].map(x=>x.map(v=>String(v??'').replace(/[\t\n]/g,' ')).join('\t')).join('\n');
+   try{await navigator.clipboard.writeText(tsv);b.textContent='已複製，貼到試算表即可'}catch(e){b.textContent='這個瀏覽器不能複製'}};
+ },e=>{done=true;clearTimeout(t);if($('#rs'))$('#rs').textContent='你的帳號沒有查看紀錄的權限。'});
+}
+function render(){if(S.i<0)intro();else if(S.i>=Q.length)result();else question()}
+render();
+</script>
+
+</body></html>
