@@ -92,6 +92,8 @@ details[open] summary{margin-bottom:12px}
 .cheat a{color:var(--blue);font-weight:800}
 .cheat ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px}
 .disc{font-size:12px;color:var(--mute)}
+.cover{display:block;width:100%;max-width:100%;height:auto;aspect-ratio:1;border-radius:14px;object-fit:cover}
+.vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 .two{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));gap:12px}
 .two label{display:flex;flex-direction:column;gap:6px;font-weight:800;font-size:15px;min-width:0}
 .two input{font-size:17px}
@@ -145,17 +147,14 @@ const app=$('#app');
 
 function intro(){
  app.innerHTML=`<section class="card">
-  <p class="lbl">講座限定・免費</p>
-  <h1>3 分鐘，看你現在的 AI 能力在哪一階</h1>
+  <img class="cover" src="cover.jpg" alt="AI 健檢：3 分鐘看你的 AI 能力" width="800" height="800">
+  <h1 class="vh">3 分鐘，看你現在的 AI 能力在哪一階</h1>
   <p class="sub">回答 7 題，馬上得到你的 AI 能力分數、每週能省下的時間，和最適合你的學習路線。</p>
-  <div class="two">
-   <label>怎麼稱呼你？<input id="nm" type="text" maxlength="12" placeholder="例如：小美" value="${esc(S.name)}" autocomplete="off"></label>
-   <label>手機<input id="ph" type="text" inputmode="tel" maxlength="20" placeholder="0912-345-678" value="${esc(S.phone)}" autocomplete="off"></label>
-  </div>
-  <div class="two"><label>帶你做健檢的工作人員<input id="st" type="text" maxlength="10" placeholder="例如：Terry" value="${esc(S.staff)}" autocomplete="off"></label></div>
+  <label for="nm"><h3>怎麼稱呼你？</h3></label>
+  <input id="nm" type="text" maxlength="12" placeholder="例如：小美" value="${esc(S.name)}" autocomplete="off">
   <div class="actions"><span></span><button class="btn" id="go">開始健檢</button></div>
  </section>`;
- const go=()=>{S.name=$('#nm').value.trim();S.phone=$('#ph').value.trim();S.staff=$('#st').value.trim();try{localStorage.setItem('hc-staff',S.staff)}catch(e){}S.i=0;render()};
+ const go=()=>{S.name=$('#nm').value.trim();S.i=0;render()};
  $('#go').onclick=go;$('#nm').onkeydown=e=>{if(e.key==='Enter')go()};
 }
 function question(){
@@ -263,7 +262,7 @@ function result(){
  window.scrollTo({top:0});
  store(R);
 }
-function summary(R){const a=S.a;return `【AI 健檢】${S.name||'未填名'} ${S.phone||''}\n分數 ${R.score}（${R.level[0]}）推薦 ${R.plan.n}\n工作：${a.job||'—'}｜每週重複工作：${a.hrs||'—'}\n用過：${R.used.join('、')||'都還沒用過'}\n想做：${R.goal.join('、')||'—'}\n卡點：${a.stuck||'—'}｜時段：${a.when||'—'}｜成果：${a.speed||'—'}\n工作人員：${S.staff||'—'}`}
+function summary(R){const a=S.a;return `【AI 健檢】${S.name||'未填名'}\n分數 ${R.score}（${R.level[0]}）推薦 ${R.plan.n}\n工作：${a.job||'—'}｜每週重複工作：${a.hrs||'—'}\n用過：${R.used.join('、')||'都還沒用過'}\n想做：${R.goal.join('、')||'—'}\n卡點：${a.stuck||'—'}｜時段：${a.when||'—'}｜成果：${a.speed||'—'}`}
 async function store(R){
  const box=$('#save');const txt=summary(R);
  const fail=()=>{if(!box.isConnected)return;box.className='save bad';box.innerHTML=`<b>做完了！把這個畫面給現場小幫手看</b><span class="sub">工作人員：按「複製」把下面這段傳給 66。</span><textarea readonly>${esc(txt)}</textarea><div><button class="btn ghost" id="cp">複製</button></div>`;
