@@ -17,7 +17,7 @@
 :root[data-theme="dark"]{
   --bg:#0f1524;--card:#18203a;--ink:#eef2ff;--sub:#b3bdd6;--mute:#8590ab;--line:#2a3456;
   --blue:#5f8cff;--blue-soft:#1f2b52;--navy:#0a0f1d;--sel:#22305c;--good:#3cc99c;--warn:#f2a640;color-scheme:dark}
-*{box-sizing:border-box}
+*{box-sizing:border-box}[hidden]{display:none!important}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:"Noto Sans TC","PingFang TC",system-ui,sans-serif;font-size:16px;line-height:1.55}
 .top{background:var(--navy);color:var(--navy-ink);padding-block:14px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
 .top .in{max-width:760px;margin:0 auto;display:flex;align-items:center;gap:14px}
@@ -91,6 +91,14 @@ details[open] summary{margin-bottom:12px}
 .cheat q{display:block;background:var(--bg);border-radius:10px;padding:10px 14px;quotes:"「" "」"}
 .cheat a{color:var(--blue);font-weight:800}
 .cheat ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px}
+.plans{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:14px}
+.pc{border:2px solid var(--line);border-radius:16px;overflow:hidden;background:var(--card);display:flex;flex-direction:column;min-width:0}
+.pc.rec{border-color:var(--blue);box-shadow:0 0 0 3px var(--blue-soft)}
+.pc img{display:block;width:100%;aspect-ratio:16/9;object-fit:cover;max-width:100%}
+.pc .pb{padding:14px 16px 16px;display:flex;flex-direction:column;gap:6px}
+.pc .ph{display:flex;align-items:center;gap:10px;justify-content:space-between}
+.pc em{font-style:normal;color:var(--blue);font-weight:800;font-size:14px}
+.pc ul{margin:4px 0 0;padding-left:18px;font-size:15px;display:flex;flex-direction:column;gap:4px}
 .disc{font-size:12px;color:var(--mute)}
 .cover{display:block;width:100%;max-width:100%;height:auto;aspect-ratio:1;border-radius:14px;object-fit:cover}
 .vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
@@ -124,10 +132,10 @@ const Q=[
  {id:'speed',t:'你希望多久看到第一個成果？',o:['1 個月內','2 個月內','半年內慢慢來']},
 ];
 const PLANS=[
- {n:'方案 1｜扎實成為高手',d:'5 個月',goal:'AI 漫劇、自媒體高手',tiers:[1,2],hot:1},
- {n:'方案 2｜全方位高手',d:'8 個月',goal:'AI App 開發者',tiers:[1,2,3]},
+ {n:'方案 1｜扎實成為高手',d:'5 個月',goal:'AI 漫劇、自媒體高手',tiers:[1,2],hot:1,img:'plan-2w.jpg'},
+ {n:'方案 2｜全方位高手',d:'8 個月',goal:'AI App 開發者',tiers:[1,2,3],img:'plan-3w.jpg'},
 ];
-const TIERS={1:['初階班','做數字人・2 個月'],2:['中階班','短影音＋AI 漫劇・3 個月'],3:['高階班','用講的做 App・3 個月']};
+const TIERS={1:['第一階段','做數字人・2 個月'],2:['第二階段','短影音＋AI 漫劇・3 個月'],3:['第三階段','用講的做 App・3 個月']};
 const FIRST={1:[['第 1 週','建立你的人物分身'],['第 2 週','3 張專業商品照'],['第 6 週','你的 AI 分身開口說話'],['第 8 週','期末作品集發表']],
  2:[['第 1 週','30 個選題清單'],['第 3 週','一支字卡口播短影音'],['第 7 週','第 1 集 1 分鐘漫劇'],['第 8 週','第 1 集正式上架']],
  3:[['第 1 週','用講的做出第一個網頁'],['第 4 週','放到手機桌面像 App'],['第 9 週','店家菜單網頁'],['第 10 週','店家 AI 小幫手']]};
@@ -209,7 +217,7 @@ function result(){
  const R=calc(),a=S.a,nm=S.name?esc(S.name):'你';
  const fix=FIX[a.stuck];
  const when=a.when==='都不太行'?'時段都不太行：先登記候補，下一梯開新時段會優先通知你':a.when==='兩個都可以'?'週日 13:00～16:00 或週一 14:00～17:00，兩班都可以選':`${a.when}，12/13 那週開課`;
- const speed=a.speed==='1 個月內'?'第 1 週就做出人物分身，1 個月內有 4 個成品':a.speed==='2 個月內'?'2 個月完成初階，帶走一整套作品集':'照你的步調，一階一階往上';
+ const speed=a.speed==='1 個月內'?'第 1 週就做出人物分身，1 個月內有 4 個成品':a.speed==='2 個月內'?'2 個月完成第一階段，帶走一整套作品集':'照你的步調，一階一階往上';
  app.innerHTML=`<section class="card">
   <p class="lbl">${nm} 的 AI 健檢報告</p>
   <div class="score">
@@ -231,23 +239,21 @@ function result(){
   <div class="stat"><span class="mute">想做出的作品</span><b>${R.goal.length}<small> 項</small></b><span class="mute">課綱全部涵蓋</span></div>
  </section>
  ${fix?`<section class="card"><h3>你最卡的地方，課堂上怎麼解</h3><div class="fix"><div><b>${esc(a.stuck)}</b></div><div class="ok"><b>${fix[0]}</b><p class="sub">${fix[1]}</p></div></div></section>`:''}
- <section class="plan">
-  <p class="lbl">最適合你的路線</p>
-  <h2>${R.plan.n}${R.plan.hot?'　<span class="pill">最熱門</span>':''}</h2>
-  <p class="sub">${R.plan.d}・每週 3 小時・目標：${R.plan.goal}</p>
-  <div class="steps">${[1,2,3].map(t=>`<div class="step ${R.plan.tiers.includes(t)?'on':'off'}"><b>第 ${t} 階　${TIERS[t][0]}</b><span>${TIERS[t][1]}</span></div>`).join('')}</div>
-  <h3>你會做出這些</h3>
-  <div class="wk">${R.plan.tiers.flatMap(t=>FIRST[t].slice(0,t===1?4:2).map(([w,x])=>`<div><b>${TIERS[t][0].slice(0,2)}${w.replace(/ /g,'')}</b><span>${x}</span></div>`)).join('')}</div>
+ <section class="card">
+  <p class="lbl">推薦給你的兩個方案</p>
+  <div class="plans">${PLANS.map((p,k)=>`<div class="pc${p===R.plan?' rec':''}"><img src="${p.img}" alt="" loading="lazy"><div class="pb"><div class="ph"><em>方案 ${k+1}</em>${p===R.plan?'<span class="pill">最適合你</span>':''}</div><h2>${p.n.split('｜')[1]}</h2><p class="sub">目標：${p.goal}・${p.d}</p><ul>${p.tiers.map(t=>`<li><b>${TIERS[t][0]}</b>－${TIERS[t][1]}</li>`).join('')}</ul></div></div>`).join('')}</div>
+  <h3>${R.plan.n.split('｜')[1]}，你會做出這些</h3>
+  <div class="wk">${R.plan.tiers.flatMap(t=>FIRST[t].slice(0,2).map(([w,x])=>`<div><b>${TIERS[t][0]}${w.replace(/ /g,'')}</b><span>${x}</span></div>`)).join('')}</div>
   <p class="sub"><b>上課時段：</b>${when}</p>
   <p class="sub"><b>成果節奏：</b>${speed}</p>
  </section>
- <div class="save" id="save"></div>
+ <div class="save" id="save" hidden></div>
  <p class="disc">本健檢依你的回答估算，分數供選課參考。學員收入、成果依個人投入而異。</p>
  <div class="actions"><button class="btn ghost" id="redo">修改答案</button><button class="btn" id="new">換下一位</button></div>`;
  $('#redo').onclick=()=>{S.i=0;render()};
  $('#new').onclick=()=>{S={name:'',phone:'',staff:S.staff,i:-1,a:{},id:null};render()};
  window.scrollTo({top:0});
- store(R);
+
 }
 function summary(R){const a=S.a;return `【AI 健檢】${S.name||'未填名'}\n分數 ${R.score}（${R.level[0]}）推薦 ${R.plan.n}\n工作：${a.job||'—'}｜每週重複工作：${a.hrs||'—'}\n用過：${R.used.join('、')||'都還沒用過'}\n想做：${R.goal.join('、')||'—'}\n卡點：${a.stuck||'—'}｜時段：${a.when||'—'}｜成果：${a.speed||'—'}`}
 async function store(R){
