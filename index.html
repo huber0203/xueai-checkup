@@ -122,8 +122,8 @@ const Q=[
  {id:'speed',t:'你希望多久看到第一個成果？',o:['1 個月內','2 個月內','半年內慢慢來']},
 ];
 const PLANS=[
- {n:'方案 1｜初階＋中階',d:'5 個月',goal:'AI 漫劇、自媒體高手',tiers:[1,2],hot:1},
- {n:'方案 2｜三階全包',d:'8 個月',goal:'AI App 開發者',tiers:[1,2,3]},
+ {n:'方案 1｜扎實成為高手',d:'5 個月',goal:'AI 漫劇、自媒體高手',tiers:[1,2],hot:1},
+ {n:'方案 2｜全方位高手',d:'8 個月',goal:'AI App 開發者',tiers:[1,2,3]},
 ];
 const TIERS={1:['初階班','做數字人・2 個月'],2:['中階班','短影音＋AI 漫劇・3 個月'],3:['高階班','用講的做 App・3 個月']};
 const FIRST={1:[['第 1 週','建立你的人物分身'],['第 2 週','3 張專業商品照'],['第 6 週','你的 AI 分身開口說話'],['第 8 週','期末作品集發表']],
@@ -224,7 +224,7 @@ function result(){
  <section class="card">
   <h3>五項能力：現在 vs 學完</h3>
   <div class="dims">${R.dims.map(([n,v,t])=>`<div class="dim"><span>${n}</span><div class="tr"><i class="to" style="width:${t}%"></i><i class="now" style="width:${v}%"></i></div><em>${v}</em></div>`).join('')}</div>
-  <div class="legend"><span>現在</span><span class="t">學完${R.plan.n.split('｜')[1]}</span></div>
+  <div class="legend"><span>現在</span><span class="t">學完後</span></div>
  </section>
  <section class="stats">
   <div class="stat"><span class="mute">學會後，每週可省下</span><b>${R.save}<small> 小時</small></b><span class="mute">一年約 ${R.save*50} 小時</span></div>
@@ -250,7 +250,7 @@ function result(){
     <li>卡點：${esc(a.stuck||'—')}　時段：${esc(a.when||'—')}　想看到成果：${esc(a.speed||'—')}</li>
     <li>工作：${esc(a.job||'—')}　每週重複工作：${esc(a.hrs||'—')}</li>
    </ul>
-   <q>${nm}，你現在是${R.level[0]}，照你想做的${R.goal.length?esc(R.goal[0].split('、')[0]):'作品'}，最適合從${R.plan.n.split('｜')[1]}開始。學會後一週能省 ${R.save} 小時，一年就是 ${R.save*50} 小時。今天現場報名有獨家優惠，我直接帶你看價格。</q>
+   <q>${nm}，你現在是${R.level[0]}，照你想做的${R.goal.length?esc(R.goal[0].split('、')[0]):'作品'}，最適合選${R.plan.n.split('｜')[1]}這個方案。學會後一週能省 ${R.save} 小時，一年就是 ${R.save*50} 小時。今天現場報名有獨家優惠，我直接帶你看價格。</q>
    ${a.when==='都不太行'?'<q>時段我先幫你登記候補，你先把今天的優惠鎖下來，開新班我第一個通知你。</q>':''}
    <p class="mute">記得把結果記到撥號台，並在問卷右下角勾「已健檢」。</p>
   </div>
